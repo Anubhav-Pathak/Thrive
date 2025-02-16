@@ -12,6 +12,9 @@ logs/
 node_modules/
 jspm_packages/
 
+# Prisma 
+prisma/migrations
+
 # Optional npm cache directory
 .npm
 
