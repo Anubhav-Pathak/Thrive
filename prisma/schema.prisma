@@ -23,8 +23,8 @@ model Story {
   id           String   @id @default(uuid())
   title        String
   description  String
-  imageUrl     String?
   type         String
+  status       String  
   createdAt    DateTime @default(now())
   lastPlayedAt DateTime?
   players      Player[] @relation("PlayerStory")
