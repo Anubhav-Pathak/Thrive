@@ -39,6 +39,16 @@ export default class Queries {
         MERGE (s)-[:HAS]->(pl)
         MERGE (s)-[:CURRENTLY_AT]->(pl);
     `;
+    static getExistingPlotQuery = `
+        MATCH (p:Player {id: $playerId})-[:PLAYING]->(s:Story {id: $storyId})-[c:CURRENTLY_AT]->(pl:Plot)
+        OPTIONAL MATCH (pl)-[:LEADS_TO {id: $choiceId}]->(ep:Plot)
+        WITH s, c, ep
+        WHERE ep IS NOT NULL
+        DELETE c
+        CREATE (s)-[:CURRENTLY_AT]->(ep)
+        RETURN ep;
+    `;
+
     static newPlotQuery = `
         MATCH (p:Player {id: $playerId})-[:PLAYING]->(s:Story {id: $storyId})-[c:CURRENTLY_AT]->(pp:Plot) 
         CREATE (np:Plot {

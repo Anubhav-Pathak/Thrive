@@ -9,7 +9,13 @@ export default class Choice {
         this.title = title;
     }
 
-    static fromJson(data: string): Choice {
-        return new Choice(uuid(), data);
+    static fromJson(data: any): Choice {
+        return typeof data === 'string' ? new Choice(
+            uuid(),
+            data
+        ) : new Choice(
+            data.id,
+            data.title
+        );
     }
 }

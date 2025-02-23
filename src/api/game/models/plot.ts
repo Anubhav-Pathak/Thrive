@@ -15,9 +15,11 @@ export default class Plot {
     }
 
     static fromJson(data: any): Plot {
-        const title = data.title;
-        const description = data.description;
-        const choices = data.choices.map((choice: any) => Choice.fromJson(choice));
-        return new Plot(uuid(), title, description, choices);
+        return new Plot(
+            data.id || uuid(),
+            data.title,
+            data.description,
+            typeof data.choices === 'string' ? data.choices = JSON.parse(data.choices) : data.choices.map((c: any) => Choice.fromJson(c))
+        );
     }
 }

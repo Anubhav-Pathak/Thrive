@@ -75,6 +75,16 @@ export default class Neo4JService {
         await this.connector.closeSession(session);
     }
 
+    getExistingPlot = async (playerId: string, storyId: string, choiceId: string) : Promise<any> => {
+        const session = await this.connector.openSession();
+        const result = await this.connector.runQuery(session, Queries.getExistingPlotQuery, { playerId, storyId, choiceId });
+        await this.connector.closeSession(session);
+        if (result.length === 0) {
+            return null;
+        }
+        return result[0].ep.properties;
+    }
+
     newPlot = async (playerId: string, storyId: string, plot: Plot, choice: Choice) : Promise<void> => {
         const session = await this.connector.openSession();
         await this.connector.runQuery(session, Queries.newPlotQuery, { 

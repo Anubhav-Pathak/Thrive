@@ -31,7 +31,6 @@ export default class GameController {
         const currentPlot = await this.graphDb.getCurrentPlot(playerId, storyId);
 
         if(currentPlot) {
-            currentPlot.choices = JSON.parse(currentPlot.choices);
             plot = Plot.fromJson(currentPlot);
         } else {
             const story = await this.prisma.story.findUnique({
@@ -55,34 +54,39 @@ export default class GameController {
 
     next = async (req: Request, res: Response) => {
         const { playerId, storyId, choiceId } = req.body;
+        let plot = null;
 
-        const currentPlot = await this.graphDb.getCurrentPlot(playerId, storyId);
-        currentPlot.choices = JSON.parse(currentPlot.choices);
-        const choice = currentPlot.choices.find((c: any) => c.id === choiceId);
+        const existingPlot = await this.graphDb.getExistingPlot(playerId, storyId, choiceId);
 
-        const response = await this.agent.generateContent(Prompts.nextPlotPrompt(currentPlot, choice));
-        const data = this.agent.parse(response);
-
-        const newPlot = Plot.fromJson(data);
-
-        await this.graphDb.newPlot(playerId, storyId, newPlot, choice);
-
+        if (existingPlot) {
+            plot = Plot.fromJson(existingPlot);
+        } else {
+            let currentPlot = await this.graphDb.getCurrentPlot(playerId, storyId);
+            currentPlot = Plot.fromJson(currentPlot);
+            const choice = currentPlot.choices.find((c: any) => c.id === choiceId);
+    
+            const response = await this.agent.generateContent(Prompts.nextPlotPrompt(currentPlot, choice));
+            const data = this.agent.parse(response);
+    
+            plot = Plot.fromJson(data);
+    
+            await this.graphDb.newPlot(playerId, storyId, plot, choice);
+        }
         res.json({
             message: 'Next Plot Generated',
-            data: newPlot
+            data: plot
         });
     }
 
     previous = async (req: Request, res: Response) => {
         const { playerId, storyId } = req.body;
 
-        const previousPlot = await this.graphDb.previousPlot(playerId, storyId);
-        previousPlot.choices = JSON.parse(previousPlot.choices);
-        const plot = Plot.fromJson(previousPlot);
+        let previousPlot = await this.graphDb.previousPlot(playerId, storyId);
+        previousPlot = Plot.fromJson(previousPlot);
 
         res.json({
             message: 'Previous Plot Generated',
-            data: plot
+            data: previousPlot
         });
     }
 }

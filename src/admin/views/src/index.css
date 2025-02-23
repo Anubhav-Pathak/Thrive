@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+    background-color: #111111;
+}
+
+@keyframes neonBorder {
+  0% { border-image-source: linear-gradient(45deg, #00f2ff, #8a2be2, #ff00ff, #00f2ff); }
+  50% { border-image-source: linear-gradient(45deg, #ff00ff, #00f2ff, #8a2be2, #ff00ff); }
+  100% { border-image-source: linear-gradient(45deg, #00f2ff, #8a2be2, #ff00ff, #00f2ff); }
+}
+
+.animate-neon-border {
+  animation: neonBorder 3s infinite alternate;
+}
